@@ -4,7 +4,10 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import BookmarkButton from './Components/BookmarkButton';
 import FavoritesSidebar from './Components/FavoritesSidebar';
 import ShareButtons from './Components/ShareButtons';
-import blue_earth from '../src/img/blue_earth.png'
+import blue_earth from '../src/img/blue_earth.png';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faHeart } from '@fortawesome/free-solid-svg-icons';
+import { Badge } from 'react-bootstrap';
 import './App.css';
 
 const NewsList = () => {
@@ -35,10 +38,10 @@ const NewsList = () => {
 
   const removeFromFavorites = (url) => {
     setFavoriteNews((prevFavorites) => {
-      const removedNews = prevFavorites.find((article) => article.url === url);  
+      const removedNews = prevFavorites.find((article) => article.url === url);
       const updatedFavorites = prevFavorites.filter((article) => article.url !== url);
       localStorage.setItem('favoriteNews', JSON.stringify(updatedFavorites));
-      
+
       setFilteredArticles((prevArticles) => [removedNews, ...prevArticles]);
 
       return updatedFavorites;
@@ -84,7 +87,12 @@ const NewsList = () => {
         );
       }
 
-      setFilteredArticles(sortedArticles);
+      // Filtrar las noticias que ya están en favoritos
+      const nonFavoriteArticles = sortedArticles.filter(
+        (article) => !favoriteNews.some((fav) => fav.url === article.url)
+      );
+
+      setFilteredArticles(nonFavoriteArticles);
 
       if (searchTerm && !sortedArticles.length) {
         setCopied(false);
@@ -96,14 +104,11 @@ const NewsList = () => {
 
   useEffect(() => {
     fetchNews();
-  }, [searchTerm, sortOption]);
-
- 
+  }, [searchTerm, sortOption, favoriteNews]);
 
   const handleChange = (event) => {
     setSearchTerm(event.target.value);
   };
-
 
   const handleCopy = (url) => {
     navigator.clipboard.writeText(url).then(() => {
@@ -120,16 +125,28 @@ const NewsList = () => {
 
   return (
     <div className="">
-      <div className='d-inline-flex pt-10 gap-1 container'>
-        <h1 className='text-light pt-4'>
-          XYZNEWS
-        </h1>
-        <img src={blue_earth} className='blue_earth' alt="Descripción de la imagen" />
+      <div className='d-inline-flex pt-10 gap-1 container d-flex justify-content-between'>
+        <div className='d-inline-flex'>
+          <h1 className='text-light pt-4'>
+            XYZNEWS
+          </h1>
+          <img src={blue_earth} className='blue_earth' alt="Descripción de la imagen" />
+        </div>
+        <div style={{ position: 'relative' }}>
+          <FontAwesomeIcon className='iconHeart' icon={faHeart} size="2x" />
+          <Badge
+            pill
+            bg="danger"
+            className='badgeRed'
+          >
+            {favoriteNews.length}
+          </Badge>
+        </div>
       </div>
-      <div >
+      <div>
         <div className="row bodyNews">
           <div className="col-md-9">
-            <div className=' pt-10 gap-1 searchNews '>
+            <div className='pt-10 gap-1 searchNews'>
               <form className="mb-4 searchNewsForm">
                 <div className="input-group-with-icon">
                   <input
@@ -147,7 +164,7 @@ const NewsList = () => {
               <div className='ad-inline-flex selectNews'>
                 <label className='sortNews'>Sort by: </label>
                 <select
-                className='form-select form-select-sm optionNews'
+                  className='form-select form-select-sm optionNews'
                   value={sortOption}
                   onChange={(e) => handleSortChange(e.target.value)}
                 >
@@ -158,7 +175,7 @@ const NewsList = () => {
               </div>
             </div>
             <div className="news-list-container">
-              <div className="news-list">
+              <div className="news-list card">
                 {filteredArticles.length === 0 ? (
                   <p className='ms-4'>No results found.</p>
                 ) : (
@@ -177,7 +194,7 @@ const NewsList = () => {
 
                       <a
                         href={article.url}
-                        className='pb-4 '
+                        className='pb-4'
                         target="_blank"
                         rel="noopener noreferrer"
                         style={{ display: 'flex' }}
@@ -185,29 +202,29 @@ const NewsList = () => {
                         Read more
                       </a>
                       <div className='d-inline-flex btnsNews gap-1'>
-                      <ShareButtons
-                      url={article.url}
-                      title={article.title}
-                      onAddToFavorites={() => addToFavorites(article)}
-                      onRemoveFromFavorites={() => removeFromFavorites(article.url)}
-                      isFavorite={favoriteNews.some((fav) => fav.url === article.url)}
-                    />
-                      <button
-                        type="button"
-                        className="btn btn-light rounded-circle"
-                        onClick={() => handleCopy(article.url)}
-                      >
-                        <i className="fa fa-clone" aria-hidden="true"></i>
-                      </button>
+                        <ShareButtons
+                          url={article.url}
+                          title={article.title}
+                          onAddToFavorites={() => addToFavorites(article)}
+                          onRemoveFromFavorites={() => removeFromFavorites(article.url)}
+                          isFavorite={favoriteNews.some((fav) => fav.url === article.url)}
+                        />
+                        <button
+                          type="button"
+                          className="btn btn-light rounded-circle"
+                          onClick={() => handleCopy(article.url)}
+                        >
+                          <i className="fa fa-clone" aria-hidden="true"></i>
+                        </button>
 
-                      <BookmarkButton
-                        article={article}
-                        onAddToFavorites={() => addToFavorites(article)}
-                        onRemoveFromFavorites={() => removeFromFavorites(article.url)}
-                        isFavorite={favoriteNews.some((fav) => fav.url === article.url)}
-                      />
+                        <BookmarkButton
+                          article={article}
+                          onAddToFavorites={() => addToFavorites(article)}
+                          onRemoveFromFavorites={() => removeFromFavorites(article.url)}
+                          isFavorite={favoriteNews.some((fav) => fav.url === article.url)}
+                        />
 
-                      <hr />
+                        <hr />
                       </div>
                       {copied && <p>URL copied to clipboard!</p>}
                     </div>
@@ -230,4 +247,4 @@ const NewsList = () => {
   );
 };
 
-export default NewsList
+export default NewsList;

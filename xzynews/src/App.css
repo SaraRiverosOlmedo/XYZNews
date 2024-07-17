@@ -171,6 +171,11 @@ ul li {
 background: linear-gradient(264deg, rgba(2,0,36,1) 0%, rgba(29,29,207,1) 35%, rgba(0,212,255,1) 100%);
   max-width: unset;
 }
+.iconHeart{
+  margin: 0px 0px 20px 20px;
+  width: 40px;
+  color: #ffff;
+}
 
 .favoriteNews{
   background: rgb(2,0,36);
@@ -230,8 +235,13 @@ ul{
 border-bottom:2px solid #ffff;
 padding: 1rem;
 }
-
-@media (max-width: 767px) {
+.iconHeart{
+  display: none;
+}
+.badgeRed{
+  display: none;
+}
+@media (max-width: 768px) {
   .searchNews {
     margin: 1rem 0 1rem 1rem;
     display: flex;
@@ -262,5 +272,15 @@ padding: 1rem;
 }
 .share-buttons{
   margin-left: 18%;
+}
+.iconHeart{
+display: block;
+padding: 15px 14px 0px 0px
+}
+.badgeRed{
+  display: block;
+  position: absolute;
+    top: 13px;
+    right: 2px;
 }
 }
